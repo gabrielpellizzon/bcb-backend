@@ -12,3 +12,44 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Client {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  phone        String
+  cpf          String   @unique
+  cnpj         String   @unique
+  companyName  String
+  plan         Plan
+  balance      Float    @default(0.0)
+  creditLimit  Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  messages     Message[]
+  consumptions Consumption[]
+}
+
+model Message {
+  id           String   @id @default(uuid())
+  clientId     String
+  client       Client   @relation(fields: [clientId], references: [id])
+  phoneNumber  String
+  isWhatsApp   Boolean
+  text         String
+  cost         Float    @default(0.25)
+  createdAt    DateTime @default(now())
+}
+
+model Consumption {
+  id           String   @id @default(uuid())
+  clientId     String
+  client       Client   @relation(fields: [clientId], references: [id])
+  amount       Float
+  createdAt    DateTime @default(now())
+}
+
+enum Plan {
+  PREPAID
+  POSTPAID
+}
