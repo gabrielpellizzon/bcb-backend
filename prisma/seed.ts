@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  const client1 = await this.prisma.client.create({
+  const client1 = await prisma.client.create({
     data: {
       name: 'Marcos Ribeiro',
       email: 'marcos.ribeiro@email.com',
@@ -18,7 +18,7 @@ async function main() {
     },
   });
 
-  const client2 = await this.prisma.client.create({
+  const client2 = await prisma.client.create({
     data: {
       name: 'Marcia Joaquina',
       email: 'marcia.joaquina@email.com',
