@@ -1,14 +1,21 @@
 import { Controller, Get, Body, Patch, Param } from '@nestjs/common';
 import { ClientService } from './services/client.service';
 import { Plan } from '@prisma/client';
+import {
+  UpdateClientBalanceDto,
+  UpdateCreditLimitDto,
+} from './dto/update-client.dto';
 
 @Controller('client')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Patch(':cpf/add-credits')
-  async addCredits(@Param('cpf') cpf: string, @Body('amount') amount: number) {
-    return this.clientService.addCredits(cpf, amount);
+  async addCredits(
+    @Param('cpf') cpf: string,
+    @Body() updateClientAmountDto: UpdateClientBalanceDto,
+  ) {
+    return this.clientService.addCredits(cpf, updateClientAmountDto.balance);
   }
 
   @Get(':cpf/balance')
@@ -19,13 +26,16 @@ export class ClientController {
   @Patch(':cpf/update-credit-limit')
   async updateCreditLimit(
     @Param('cpf') cpf: string,
-    @Body('newLimit') newLimit: number,
+    @Body() updateCreditLimitDto: UpdateCreditLimitDto,
   ) {
-    return this.clientService.updateCreditLimit(cpf, newLimit);
+    return this.clientService.updateCreditLimit(
+      cpf,
+      updateCreditLimitDto.creditLimit,
+    );
   }
 
   @Patch(':cpf/change-plan')
-  async changePlan(@Param('cpf') cpf: string, @Body('newPlan') newPlan: Plan) {
+  async changePlan(@Param('cpf') cpf: string, @Body() newPlan: Plan) {
     return this.clientService.changePlan(cpf, newPlan);
   }
 
