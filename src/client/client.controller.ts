@@ -1,34 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ClientService } from './client.service';
-import { CreateClientDto } from './dto/create-client.dto';
-import { UpdateClientDto } from './dto/update-client.dto';
+import { Controller, Get, Body, Patch, Param } from '@nestjs/common';
+import { ClientService } from './services/client.service';
+import { Plan } from '@prisma/client';
 
 @Controller('client')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
-  @Post()
-  create(@Body() createClientDto: CreateClientDto) {
-    return this.clientService.create(createClientDto);
+  @Patch(':cpf/add-credits')
+  async addCredits(@Param('cpf') cpf: string, @Body('amount') amount: number) {
+    return this.clientService.addCredits(cpf, amount);
   }
 
-  @Get()
-  findAll() {
-    return this.clientService.findAll();
+  @Get(':cpf/balance')
+  async getBalance(@Param('cpf') cpf: string) {
+    return this.clientService.getBalance(cpf);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.clientService.findOne(+id);
+  @Patch(':cpf/update-credit-limit')
+  async updateCreditLimit(
+    @Param('cpf') cpf: string,
+    @Body('newLimit') newLimit: number,
+  ) {
+    return this.clientService.updateCreditLimit(cpf, newLimit);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClientDto: UpdateClientDto) {
-    return this.clientService.update(+id, updateClientDto);
+  @Patch(':cpf/change-plan')
+  async changePlan(@Param('cpf') cpf: string, @Body('newPlan') newPlan: Plan) {
+    return this.clientService.changePlan(cpf, newPlan);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.clientService.remove(+id);
+  @Get(':cpf/details')
+  async getClientDetails(@Param('cpf') cpf: string) {
+    return this.clientService.getClientDetails(cpf);
   }
 }
