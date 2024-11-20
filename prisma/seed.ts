@@ -36,6 +36,7 @@ async function main() {
       clientId: client1.id,
       phoneNumber: '998271829',
       isWhatsApp: false,
+      to: '997182930',
       text: 'Mensagem enviada por SMS',
     },
   });
@@ -45,6 +46,7 @@ async function main() {
       clientId: client1.id,
       phoneNumber: '998182637',
       isWhatsApp: true,
+      to: '987678345',
       text: 'Mensagem enviada por Whatsapp',
     },
   });
@@ -53,7 +55,9 @@ async function main() {
     data: {
       clientId: client2.id,
       phoneNumber: '998182637',
+      to: '982121345',
       isWhatsApp: true,
+
       text: 'Primeira mensagem enviada por whatsapp',
     },
   });

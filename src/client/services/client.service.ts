@@ -29,7 +29,7 @@ export class ClientService {
   async getBalance(cpf: string) {
     const client = await this.prisma.client.findUnique({
       where: { cpf },
-      select: { balance: true },
+      select: { name: true, balance: true },
     });
 
     if (!client) throw new NotFoundException('Client not found');
