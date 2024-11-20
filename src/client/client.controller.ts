@@ -1,8 +1,8 @@
 import { Controller, Get, Body, Patch, Param } from '@nestjs/common';
 import { ClientService } from './services/client.service';
-import { Plan } from '@prisma/client';
 import {
   UpdateClientBalanceDto,
+  UpdateClientPlanDto,
   UpdateCreditLimitDto,
 } from './dto/update-client.dto';
 
@@ -35,8 +35,11 @@ export class ClientController {
   }
 
   @Patch(':cpf/change-plan')
-  async changePlan(@Param('cpf') cpf: string, @Body() newPlan: Plan) {
-    return this.clientService.changePlan(cpf, newPlan);
+  async changePlan(
+    @Param('cpf') cpf: string,
+    @Body() newPlan: UpdateClientPlanDto,
+  ) {
+    return this.clientService.changePlan(cpf, newPlan.plan);
   }
 
   @Get(':cpf/details')

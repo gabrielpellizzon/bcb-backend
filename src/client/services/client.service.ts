@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -52,12 +53,13 @@ export class ClientService {
 
   async changePlan(cpf: string, newPlan: Plan) {
     const client = await this.prisma.client.findUnique({ where: { cpf } });
-
     if (!client) throw new NotFoundException('Client not found');
+    if (client.plan === newPlan)
+      throw new ConflictException(`Client is already a ${newPlan} client`);
 
     const updatedData = {
       plan: newPlan,
-      balance: newPlan === Plan.PREPAID ? 0 : null,
+      balance: 0,
       creditLimit: newPlan === Plan.POSTPAID ? 100 : null,
     };
 

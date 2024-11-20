@@ -27,7 +27,7 @@ async function main() {
       cnpj: '72891072835627',
       companyName: 'Plus corporation',
       plan: Plan.POSTPAID,
-      balance: 90.0,
+      creditLimit: 90.0,
     },
   });
 
