@@ -6,7 +6,7 @@ import {
   UpdateCreditLimitDto,
 } from './dto/update-client.dto';
 
-@Controller('client')
+@Controller('clients')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
