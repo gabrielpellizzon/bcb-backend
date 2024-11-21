@@ -34,7 +34,6 @@ model Message {
   id           String   @id @default(uuid())
   clientId     String
   client       Client   @relation(fields: [clientId], references: [id])
-  phoneNumber  String
   to           String
   isWhatsApp   Boolean
   text         String

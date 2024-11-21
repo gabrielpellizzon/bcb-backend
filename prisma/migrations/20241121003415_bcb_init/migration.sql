@@ -23,7 +23,6 @@ CREATE TABLE "Client" (
 CREATE TABLE "Message" (
     "id" TEXT NOT NULL,
     "clientId" TEXT NOT NULL,
-    "phoneNumber" TEXT NOT NULL,
     "to" TEXT NOT NULL,
     "isWhatsApp" BOOLEAN NOT NULL,
     "text" TEXT NOT NULL,
