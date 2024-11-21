@@ -8,7 +8,7 @@
 
    - Each SMS message costs **R$0.25**.
    - Clients can choose to send messages via **WhatsApp** or **SMS**.
-   - WhatsApp messages have no additional cost (assuming the infrastructure is already integrated).
+   - WhatsApp messages have no additional cost.
 
 2. **Client Plans**:
 
