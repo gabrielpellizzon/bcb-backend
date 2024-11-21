@@ -26,7 +26,6 @@
 
 4. **Data Management**:
    - Basic client data (name, CPF, CNPJ, email, phone) must be registered.
-   - A history of sent messages should be available for consultation.
 
 ---
 
