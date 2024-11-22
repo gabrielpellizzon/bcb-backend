@@ -127,12 +127,13 @@ Make sure you have the following tools installed:
 
 ```plaintext
 bcb-backend/
-│ └── src/
 │ └── prisma/
+│ └── src/
 │ └── test/
 │ └── .env.example
 │ └── docker-compose.yml
 │ └── package.json
+│ └── package-lock.json/
 │ └── README.md
 │ └── .gitignore
 └──
