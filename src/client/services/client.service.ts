@@ -3,13 +3,86 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Plan } from '@prisma/client';
+import { CreateClientDto } from '../dto/create-client.dto';
+import * as bcrypt from 'bcrypt';
+import { LoginClientDto } from '../dto/login-client.dto';
+import { ClientPayload } from '../interfaces/clients-login.interface';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class ClientService {
-  constructor(private prisma: PrismaService) {}
+  private readonly SALT_ROUNDS = 10;
+
+  constructor(
+    private prisma: PrismaService,
+    private jwtService: JwtService,
+  ) {}
+
+  async registerClient(createClientDto: CreateClientDto) {
+    const { email, cpf, cnpj, password, services, ...otherDetails } =
+      createClientDto;
+
+    const existingClient = await this.prisma.client.findFirst({
+      where: {
+        OR: [{ email }, { cpf }, { cnpj }],
+      },
+    });
+
+    if (existingClient)
+      throw new ConflictException('Email, CPF or CNPJ alterady in use');
+
+    const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
+
+    const newClient = await this.prisma.client.create({
+      data: {
+        ...otherDetails,
+        email,
+        cpf,
+        cnpj,
+        password: hashedPassword,
+        services: services
+          ? {
+              create: {
+                plan: services.plan,
+                balance: services.balance || 0.0,
+                creditLimit: services.creditLimit,
+              },
+            }
+          : undefined,
+      },
+      include: { services: true },
+    });
+
+    delete newClient.password;
+
+    return newClient;
+  }
+
+  async loginClient(loginClientDto: LoginClientDto) {
+    const client = await this.prisma.client.findUnique({
+      where: { email: loginClientDto.email },
+    });
+
+    if (!client) throw new NotFoundException('Client not found');
+
+    if (!(await bcrypt.compare(loginClientDto.password, client.password))) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload: ClientPayload = {
+      sub: client.id,
+      email: client.email,
+      name: client.name,
+    };
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
 
   async addCredits(cpf: string, amount: number) {
     const client = await this.prisma.client.findUnique({
@@ -113,9 +186,13 @@ export class ClientService {
   }
 
   async getClientDetails(cpf: string) {
-    return this.prisma.client.findUnique({
+    const client = await this.prisma.client.findUnique({
       where: { cpf },
       include: { services: true },
     });
+
+    delete client.password;
+
+    return client;
   }
 }

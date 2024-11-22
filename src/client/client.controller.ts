@@ -1,14 +1,26 @@
-import { Controller, Get, Body, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Post } from '@nestjs/common';
 import { ClientService } from './services/client.service';
 import {
   UpdateClientBalanceDto,
   UpdateClientPlanDto,
   UpdateCreditLimitDto,
 } from './dto/update-client.dto';
+import { CreateClientDto } from './dto/create-client.dto';
+import { LoginClientDto } from './dto/login-client.dto';
 
 @Controller('clients')
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
+
+  @Post('register')
+  async registerClient(@Body() createUserDto: CreateClientDto) {
+    return this.clientService.registerClient(createUserDto);
+  }
+
+  @Post('login')
+  async loginClient(@Body() loginUserDto: LoginClientDto) {
+    return this.clientService.loginClient(loginUserDto);
+  }
 
   @Patch(':cpf/add-credits')
   async addCredits(
