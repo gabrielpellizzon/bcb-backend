@@ -100,27 +100,7 @@ Make sure you have the following tools installed:
    npm run start:dev
    ```
 
-### **4. Running the Frontend**
-
-1. Navigate to the frontend folder:
-
-   ```bash
-   cd frontend
-   ```
-
-2. Install frontend dependencies:
-
-   ```bash
-   npm install
-   ```
-
-3. Start the server:
-
-   ```bash
-   npm run start
-   ```
-
-4. Access the Swagger documentation in your browser:
+7. Access the Swagger documentation in your browser:
    - http://localhost:3000/api
 
 ## Project Structure
