@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Client, Plan } from '@prisma/client';
+import { Plan, Service } from '@prisma/client';
 import { CreateMessageDto } from '../dto/create-message.dto';
 
 @Injectable()
@@ -16,12 +16,19 @@ export class MessageService {
   async sendMessage(clientCpf: string, createMessageDto: CreateMessageDto) {
     const client = await this.prisma.client.findUnique({
       where: { cpf: clientCpf },
+      include: { services: true },
     });
 
     if (!client) throw new NotFoundException('Client not found');
 
-    if (client.plan === Plan.PREPAID) await this.handlePrePaidClient(client);
-    if (client.plan === Plan.POSTPAID) await this.handlePostPaidClient(client);
+    const service = client.services[0];
+
+    if (!service)
+      throw new BadRequestException('No service associated with this client');
+
+    if (service.plan === Plan.PREPAID) await this.handlePrePaidClient(service);
+    if (service.plan === Plan.POSTPAID)
+      await this.handlePostPaidClient(service);
 
     return this.prisma.message.create({
       data: {
@@ -33,30 +40,31 @@ export class MessageService {
     });
   }
 
-  private async handlePrePaidClient(client: Client) {
-    if (client.balance < this.SMS_COST)
+  private async handlePrePaidClient(service: Service) {
+    if (service.balance < this.SMS_COST)
       throw new BadRequestException('Insufficient balance to send the massage');
 
-    await this.prisma.client.update({
-      where: { id: client.id },
-      data: { balance: client.balance - this.SMS_COST },
+    await this.prisma.service.update({
+      where: { id: service.id },
+      data: { balance: service.balance - this.SMS_COST },
     });
   }
 
-  private async handlePostPaidClient(client: Client) {
+  private async handlePostPaidClient(service: Service) {
     const totalConsumption = await this.prisma.consumption.aggregate({
-      where: { clientId: client.id },
+      where: { clientId: service.clientId },
       _sum: { amount: true },
     });
 
     const usedLimit = totalConsumption._sum.amount || 0;
-    if (usedLimit + this.SMS_COST > client.creditLimit) {
+
+    if (usedLimit + this.SMS_COST > service.creditLimit) {
       throw new BadRequestException('Credit limit exceeded');
     }
 
     await this.prisma.consumption.create({
       data: {
-        clientId: client.id,
+        clientId: service.clientId,
         amount: this.SMS_COST,
       },
     });

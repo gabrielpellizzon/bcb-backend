@@ -23,7 +23,7 @@ export class ClientController {
     return this.clientService.getBalance(cpf);
   }
 
-  @Patch(':cpf/update-credit-limit')
+  @Patch(':cpf/credit-limit')
   async updateCreditLimit(
     @Param('cpf') cpf: string,
     @Body() updateCreditLimitDto: UpdateCreditLimitDto,

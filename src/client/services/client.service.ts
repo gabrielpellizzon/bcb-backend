@@ -12,49 +12,81 @@ export class ClientService {
   constructor(private prisma: PrismaService) {}
 
   async addCredits(cpf: string, amount: number) {
-    const client = await this.prisma.client.findUnique({ where: { cpf } });
+    const client = await this.prisma.client.findUnique({
+      where: { cpf },
+      include: { services: true },
+    });
 
     if (!client) throw new NotFoundException('Client not found');
-    if (client.plan !== Plan.PREPAID)
+
+    const service = client.services.find(
+      (service) => service.plan === Plan.PREPAID,
+    );
+
+    if (!service)
       throw new BadRequestException(
         'Only prepaid client can have credits added',
       );
 
-    return this.prisma.client.update({
-      where: { cpf },
-      data: { balance: client.balance + amount },
+    return this.prisma.service.update({
+      where: { id: service.id },
+      data: { balance: service.balance + amount },
     });
   }
 
   async getBalance(cpf: string) {
     const client = await this.prisma.client.findUnique({
       where: { cpf },
-      select: { name: true, balance: true },
+      select: { name: true, services: true },
     });
 
     if (!client) throw new NotFoundException('Client not found');
-    return client;
+
+    const prepaidService = client.services.find(
+      (service) => service.plan === Plan.PREPAID,
+    );
+    return {
+      name: client.name,
+      balance: prepaidService ? prepaidService.balance : 0,
+    };
   }
 
   async updateCreditLimit(cpf: string, newLimit: number) {
-    const client = await this.prisma.client.findUnique({ where: { cpf } });
+    const client = await this.prisma.client.findUnique({
+      where: { cpf },
+      include: { services: true },
+    });
 
     if (!client) throw new NotFoundException('Client not found');
-    if (client.plan !== Plan.POSTPAID)
+
+    const service = client.services.find(
+      (service) => service.plan === Plan.POSTPAID,
+    );
+
+    if (!service)
       throw new BadRequestException(
         'Only postpaid client can have a credit limit',
       );
 
-    return this.prisma.client.update({
-      where: { cpf },
+    return this.prisma.service.update({
+      where: { id: service.id },
       data: { creditLimit: newLimit },
     });
   }
 
   async changePlan(cpf: string, newPlan: Plan) {
-    const client = await this.prisma.client.findUnique({ where: { cpf } });
+    const client = await this.prisma.client.findUnique({
+      where: { cpf },
+      include: { services: true },
+    });
+
     if (!client) throw new NotFoundException('Client not found');
-    if (client.plan === newPlan)
+
+    const currentService = client.services.find(
+      (service) => service.plan === newPlan,
+    );
+
+    if (currentService)
       throw new ConflictException(`Client is already a ${newPlan} client`);
 
     const updatedData = {
@@ -63,13 +95,27 @@ export class ClientService {
       creditLimit: newPlan === Plan.POSTPAID ? 100 : null,
     };
 
-    return this.prisma.client.update({
-      where: { cpf },
-      data: updatedData,
+    const existingService = client.services[0];
+
+    if (existingService) {
+      return this.prisma.service.update({
+        where: { id: existingService.id },
+        data: updatedData,
+      });
+    }
+
+    return this.prisma.service.create({
+      data: {
+        clientId: client.id,
+        ...updatedData,
+      },
     });
   }
 
   async getClientDetails(cpf: string) {
-    return this.prisma.client.findUnique({ where: { cpf } });
+    return this.prisma.client.findUnique({
+      where: { cpf },
+      include: { services: true },
+    });
   }
 }

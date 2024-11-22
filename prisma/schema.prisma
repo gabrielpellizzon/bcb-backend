@@ -17,17 +17,27 @@ model Client {
   id           String   @id @default(uuid())
   name         String
   email        String   @unique
-  phone        String
   cpf          String   @unique
   cnpj         String   @unique
+  phoneNumber  String
   companyName  String
+  password     String
+  isAdmin      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  services     Service[]
+  messages     Message[]
+  consumption  Consumption[]
+}
+
+model Service {
+  id           String   @id @default(uuid())
+  clientId     String
+  client       Client   @relation(fields: [clientId], references: [id])
   plan         Plan
   balance      Float    @default(0.0)
   creditLimit  Float?
   createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  messages     Message[]
-  consumptions Consumption[]
 }
 
 model Message {

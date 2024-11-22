@@ -1,24 +1,45 @@
-import { IsEmail, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsBoolean,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
+import { CreateServiceDto } from './create-service.dto';
 
 export class CreateClientDto {
   @IsString()
+  @IsNotEmpty()
   name: string;
+
   @IsEmail()
+  @IsNotEmpty()
   email: string;
+
   @IsString()
-  phone: string;
-  @IsString()
+  @IsNotEmpty()
   cpf: string;
+
   @IsString()
+  @IsNotEmpty()
   cnpj: string;
+
   @IsString()
+  @IsNotEmpty()
+  phoneNumber: string;
+
+  @IsString()
+  @IsNotEmpty()
   companyName: string;
+
   @IsString()
-  plan: 'PREPAID' | 'POSTPAID';
+  @IsNotEmpty()
+  password: string;
+
+  @IsBoolean()
   @IsOptional()
-  @IsNumber()
-  balance?: number;
+  isAdmin?: boolean;
+
   @IsOptional()
-  @IsNumber()
-  creditLimit?: number;
+  service?: CreateServiceDto;
 }

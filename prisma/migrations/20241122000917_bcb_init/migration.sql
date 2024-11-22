@@ -6,17 +6,28 @@ CREATE TABLE "Client" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
     "cpf" TEXT NOT NULL,
     "cnpj" TEXT NOT NULL,
+    "phoneNumber" TEXT NOT NULL,
     "companyName" TEXT NOT NULL,
-    "plan" "Plan" NOT NULL,
-    "balance" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
-    "creditLimit" DOUBLE PRECISION,
+    "password" TEXT NOT NULL,
+    "isAdmin" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Client_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Service" (
+    "id" TEXT NOT NULL,
+    "clientId" TEXT NOT NULL,
+    "plan" "Plan" NOT NULL,
+    "balance" DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    "creditLimit" DOUBLE PRECISION,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Service_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -50,6 +61,9 @@ CREATE UNIQUE INDEX "Client_cpf_key" ON "Client"("cpf");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Client_cnpj_key" ON "Client"("cnpj");
+
+-- AddForeignKey
+ALTER TABLE "Service" ADD CONSTRAINT "Service_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Message" ADD CONSTRAINT "Message_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "Client"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
