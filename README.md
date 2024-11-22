@@ -127,6 +127,7 @@ Make sure you have the following tools installed:
 
 ```plaintext
 bcb-backend/
+│ └── common/
 │ └── prisma/
 │ └── src/
 │ └── test/

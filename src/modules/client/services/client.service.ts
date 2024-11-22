@@ -77,6 +77,7 @@ export class ClientService {
       sub: client.id,
       email: client.email,
       name: client.name,
+      isAdmin: client.isAdmin,
     };
 
     return {
