@@ -44,7 +44,7 @@
 
 Make sure you have the following tools installed:
 
-- [Docker](https://www.docker.com/)
+- [Docker & Docker Compose](https://docs.docker.com/)
 - [Node.js](https://nodejs.org/)
 - [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
 
